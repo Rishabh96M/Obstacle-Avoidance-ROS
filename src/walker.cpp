@@ -25,34 +25,47 @@
 #include "sensor_msgs/LaserScan.h"
 #include "geometry_msgs/Twist.h"
 
+
+
+ros::Publisher pub;
+
+/**
+ * @brief A function to check for obstacles using the lidar data
+ *
+ * @param: (sensor_msgs::LaserScan) Lidar data
+ * @return: (bool) if or not there is an obstacle
+ */
+bool obstacle_detected(const sensor_msgs::LaserScan::ConstPtr& msg){
+	// Checking for +20 degrees to -20 degrees
+	std::array<int, 41> degrees = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 , 11, 12,
+				13, 14, 15, 16, 17, 18, 19, 20, 340, 341, 342, 343, 344, 345, 346,
+				347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359};
+
+	// If obstacle is present before 0.4 meters return true
+	for(auto i : degrees) {
+		if(msg->ranges[i] < 0.4){
+			ROS_INFO("Obstacle Detected");
+			return true;
+		}
+	}
+	ROS_INFO("Obstacle Not Detected");
+	return false;
+}
+
 /**
  * @brief A callback function to print out the data received from lidar and
  * moving the robot to avoid obstacles
  *
- * @param: (String) received message object
+ * @param: (sensor_msgs::LaserScan) Lidar data
  */
-
-ros::Publisher pub;
-
 void walkerCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
-	//Checking for obstacle
-	bool obstacle_detected = false;
-
-	std::array<int, 41> degrees = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 , 11, 12,
-			13, 14, 15, 16, 17, 18, 19, 20, 340, 341, 342, 343, 344, 345, 346,
-			347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359};
-	for(auto i : degrees) {
-		if(msg->ranges[i] < 0.4){
-			obstacle_detected = true;
-			break;
-		}
-	}
-
 	geometry_msgs::Twist move_cmd;
-	if(obstacle_detected){
+	if(obstacle_detected(msg)){
+		// Obstacle ahead so turn
 		move_cmd.linear.x = 0.0;
 		move_cmd.angular.z = 0.2;
 	} else {
+		// No obstacle ahead so go straight
 		move_cmd.linear.x = 0.2;
 		move_cmd.angular.z = 0.0;
 	}
