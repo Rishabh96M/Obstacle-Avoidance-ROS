@@ -1,5 +1,5 @@
 # walker
-A ROS package for obstacle avoidance using the topics /scan and /cmd_vel, Vallidated on Ubuntu 20.04 LTS and ROS Noetic.
+A ROS package for obstacle avoidance of turtlebot3 using the topics /scan and /cmd_vel, Vallidated on Ubuntu 20.04 LTS and ROS Noetic.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
